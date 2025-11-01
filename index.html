@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Compteur d'Angoisse - Horror Twitch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: transparent;
+      font-family: 'Creepster', Arial, sans-serif;
+    }
+    .compteur-angoisse {
+      width: 420px;
+      padding: 27px 30px 19px 30px;
+      background: linear-gradient(135deg, #160D13 75%, #460006 100%);
+      border: 3px solid #911C1D;
+      box-shadow: 0 0 60px #21021D, 0 0 18px #b70017;
+      border-radius: 18px;
+      color: #ffe8ea;
+      text-align: center;
+      filter: drop-shadow(0 1px 11px #440007a0);
+      position: relative;
+      overflow: hidden;
+    }
+    .titre-angoisse {
+      font-size: 2.2em;
+      letter-spacing: .07em;
+      margin-bottom: 15px;
+      text-shadow: 0 0 18px #d30029b9, 2px 3px 7px #350002, 0 0 9px #ec003a99;
+      font-family: 'Creepster', Arial, sans-serif;
+      z-index: 2;
+      position: relative;
+    }
+    .progress-bg {
+      position: relative;
+      width: 96%;
+      height: 40px;
+      margin: 0 auto 16px auto;
+      background: repeating-linear-gradient(135deg, #241, #441 6px, #2c090d 12px, #be0d1b 16px);
+      border-radius: 15px;
+      border: 3px solid #5e0810;
+      overflow: hidden;
+      box-shadow: 0 0 20px #450013;
+    }
+    .progress-fg {
+      position: absolute;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dc001a 20%, #441109 100%);
+      box-shadow: 0 0 22px #be080a8a;
+      border-radius: 15px 0 0 15px;
+      transition: width 1.0s cubic-bezier(.68,-0.55,.27,1.55);
+      z-index: 1;
+    }
+    .pourcentage {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      line-height: 40px;
+      font-size: 1.6em;
+      color: #fff5f8;
+      text-shadow: 1px 1px 9px #b10014, 0 0 10px #872;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Tremblement long (5s) */
+    .effet-glitch {
+      animation: shake 5s;
+      color: #ff4e65;
+      text-shadow: 2px 2px 19px #b8002aff, 0 0 8px #fbe;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0);}
+      10% { transform: translateX(-8px);}
+      20% { transform: translateX(8px);}
+      30% { transform: translateX(-3px);}
+      40% { transform: translateX(5px);}
+      50% { transform: translateX(-8px);}
+      60% { transform: translateX(8px);}
+      70% { transform: translateX(-5px);}
+      80% { transform: translateX(5px);}
+      90% { transform: translateX(-6px);}
+      100% { transform: translateX(0);}
+    }
+
+    /* --- VHS/EFFET GLITCH --- */
+    .vhs-overlay {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      opacity: 0.82;
+      mix-blend-mode: lighten;
+      display: none;
+      animation: vhs-fadein 0.22s;
+    }
+    .vhs-on {
+      display: block;
+      animation: vhs-fadein 0.22s;
+    }
+    @keyframes vhs-fadein {
+      from { opacity: 0; }
+      to { opacity: 0.82; }
+    }
+    .vhs-lines {
+      width: 100%; height: 100%;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(240, 232, 232, 0.085) 0px,
+          rgba(35,10,25,0.07) 2px,
+          rgba(0,0,0,0.1) 3px,
+          transparent 4px, transparent 8px
+        );
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      animation: vhs-move 0.15s linear infinite;
+    }
+    @keyframes vhs-move {
+      100% { background-position-y: 8px; }
+    }
+    .vhs-distort {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        repeating-linear-gradient(
+          100deg,
+          rgba(255, 0, 170, 0.10) 0 2%,
+          rgba(50, 0, 50, 0.04) 2% 7%,
+          transparent 7% 14%
+        );
+      filter: blur(1.5px) contrast(1.35) brightness(1.35) saturate(1.4);
+      opacity: 0.46;
+      z-index: 5;
+      animation: vhs-distort 0.07s infinite alternate;
+    }
+    @keyframes vhs-distort {
+      100% { filter: blur(2px) contrast(2) brightness(2) saturate(2); }
+    }
+    .vhs-glow {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      border-radius: 18px;
+      box-shadow: 0 0 80px 30px #E0115F66, 0 0 220px 90px #ff0010cc inset;
+      z-index: 6;
+      pointer-events: none;
+      mix-blend-mode: lighten;
+      opacity: 0.11;
+      animation: vhs-glow 0.4s alternate infinite;
+    }
+    @keyframes vhs-glow {
+      100% { opacity: 0.25;}
+    }
+    .actions {
+      margin-top: 12px;
+    }
+    .actions button {
+      background: #440009;
+      color: #ffc6cc;
+      border: 2px solid #c1101a;
+      padding: 6px 17px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Creepster', Arial, sans-serif;
+      font-size: 1.19em;
+      box-shadow: 0 0 10px #430014;
+      letter-spacing: .07em;
+      margin: 0 8px;
+      transition: background .16s;
+    }
+    .actions button:hover {
+      background: #900025;
+      color: #fff;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script src="https://unpkg.com/tmi.js@1.8.5"></script>
+</head>
+<body>
+  <div class="compteur-angoisse">
+    <span class="vhs-overlay" id="vhsfx">
+      <span class="vhs-lines"></span>
+      <span class="vhs-distort"></span>
+      <span class="vhs-glow"></span>
+    </span>
+    <div class="titre-angoisse" id="titreAngoisse">Compteur d’angoisse</div>
+    <div class="progress-bg">
+      <div class="progress-fg" id="progressAngoisse"></div>
+      <div class="pourcentage" id="pourcentAngoisse">0%</div>
+    </div>
+    <div class="actions" id="actionsTest">
+      <button onclick="ajouterAngoisse()">+ Angoisse</button>
+      <button onclick="resetAngoisse()">Reset</button>
+    </div>
+    <!-- Preload audio -->
+    <audio id="jumpscareAudio" src="jumpscare.mp3" preload="auto"></audio>
+  </div>
+  <script>
+    // Variables et paramètres
+    let angoisseActuelle = 0;
+    const ANGOISSE_MAX = 15;
+    let estGlitch = false;
+    let modeTest = true; // passera auto à false si tmi.js connecté
+
+    function afficherAngoisse() {
+      let pourcent = Math.round((angoisseActuelle / ANGOISSE_MAX) * 100);
+      if (pourcent > 100) pourcent = 100;
+      anime({
+        targets: '#progressAngoisse',
+        width: pourcent + '%',
+        duration: 900,
+        easing: 'easeOutElastic(1, .8)'
+      });
+
+      document.getElementById('pourcentAngoisse').textContent = `${pourcent}%`;
+
+      const titre = document.getElementById('titreAngoisse');
+      const vhsfx = document.getElementById('vhsfx');
+      const audio = document.getElementById('jumpscareAudio');
+
+      if (angoisseActuelle >= ANGOISSE_MAX) {
+        if (!estGlitch) {
+          titre.textContent = "ANGOISSE À SON PAROXYSME !";
+          titre.classList.add("effet-glitch");
+          vhsfx.classList.add("vhs-on");
+          estGlitch = true;
+          // Lecture jumpscare
+          audio.currentTime = 0;
+          audio.play();
+          setTimeout(() => {
+            titre.textContent = "Compteur d’angoisse";
+            titre.classList.remove("effet-glitch");
+            vhsfx.classList.remove("vhs-on");
+            estGlitch = false;
+            angoisseActuelle = 0;
+            afficherAngoisse();
+          }, 5200); // 5,2s de tremblement+VHS avant reset
+        }
+      } else {
+        titre.classList.remove("effet-glitch");
+        titre.textContent = "Compteur d’angoisse";
+        vhsfx.classList.remove("vhs-on");
+        estGlitch = false;
+      }
+    }
+
+    function ajouterAngoisse() {
+      if (angoisseActuelle < ANGOISSE_MAX) {
+        angoisseActuelle++;
+        afficherAngoisse();
+      } else {
+        angoisseActuelle = ANGOISSE_MAX;
+        afficherAngoisse();
+      }
+    }
+
+    function resetAngoisse() {
+      angoisseActuelle = 0;
+      afficherAngoisse();
+    }
+
+    document.addEventListener('DOMContentLoaded', afficherAngoisse);
+
+    // Intégration chat Twitch (mode Live)
+    let client;
+    try {
+      client = new tmi.Client({ channels: ['zarachiiii'] }); // change 'zarachiiii' si besoin !
+      client.connect();
+    } catch (e) {console.warn("tmi.js non chargé");}
+    if (typeof tmi !== "undefined") {
+      client.on('message', (channel, tags, message, self) => {
+        if (self) return;
+        // modeTest désactivé si chat Twitch connecté
+        if (modeTest) {
+          document.getElementById('actionsTest').style.display = 'none';
+          modeTest = false;
+        }
+        if (message.toLowerCase().includes('!peur')) {
+          ajouterAngoisse();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
